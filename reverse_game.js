@@ -15,7 +15,15 @@ async function start() {
     let guess = await ask("Guess a number between 1 and 100 ")
     guess = parseInt(guess)
     while (guess !== randNum) {
-        
+        while (isNaN(secretNumber) || secretNumber > max || secretNumber < min) {
+            if (isNaN(secretNumber)) {
+              secretNumber = await ask('You did not enter a number. Try again. ')
+              secretNumber = parseInt(secretNumber)
+            } else if (secretNumber > max || secretNumber < min) {
+              secretNumber = await ask(`${secretNumber} is outside the range. Pick another number `)
+              secretNumber = parseInt(secretNumber)
+            }
+          }
         if (guess < randNum) {
             guess = await ask("Your guess was too low. Guess again. ")
             guess = parseInt(guess)

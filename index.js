@@ -9,7 +9,9 @@ function ask(questionText) {
 }
 // Choose which game is played. 
 async function gameSelect() {
+  //assigns 1 or 2 to chosenGame
   let chosenGame = await ask(`Welcome to the number guesser game. \nIf you would like me to guess a number, type "1" \nIf you would like to guess a number, type "2" \n`)
+  //checks if user input is not 1 or 2, keeps asking until user enters valid response
   while (chosenGame !== "1" && chosenGame !== "2") {
     chosenGame = await ask(`"${chosenGame}" is an invalid input. Try again. `)
   }
@@ -21,9 +23,9 @@ async function gameSelect() {
     userGuess()
   }
 }
-// run the function to choose the game
+// call the function to choose the game
 gameSelect()
-// the main game
+// the main game. contains both async function for the main game
 function compGuess() {
   // inits max range
   let max;
@@ -54,9 +56,11 @@ function compGuess() {
     secretNumber = parseInt(secretNumber)
     // checks if secretNumber is a number and if it is within the range
     while (isNaN(secretNumber) || secretNumber > max || secretNumber < min) {
+      // requests new input if NaN
       if (isNaN(secretNumber)) {
         secretNumber = await ask('You did not enter a number. Try again. ')
         secretNumber = parseInt(secretNumber)
+        // requests new input if outside range
       } else if (secretNumber > max || secretNumber < min) {
         secretNumber = await ask(`${secretNumber} is outside the range. Pick another number `)
         secretNumber = parseInt(secretNumber)
@@ -115,38 +119,47 @@ function compGuess() {
       let newNum = Math.floor((max + min) / 2)
       // reassign yesNo based on new guess
       yesNo = await ask(`Is your number ${newNum}? `)
-      // check if yesNo has invalid input
+      // check if yesNo is an invalid input
       while (yesNo.toLowerCase() !== 'n' && yesNo.toLowerCase() !== 'no' && yesNo.toLowerCase() !== 'y' && yesNo.toLowerCase() !== 'yes') {
         yesNo = await ask(`"${yesNo}" is an invalid input. Is your number ${newNum}? `)
       }
+      // add one to guess count after new guess
       guessNum += 1
-
       return newNum
+      // if user input l
     } else if (higherLower.toLowerCase() === 'l') {
-      // change the range by lowering the max to the guess 'numOne'
+      // change the range by lowering the max to the guess 'numOne'. -1 so it doesn't make the same guess
       max = numOne - 1
       let newNum = Math.floor((max + min) / 2)
       yesNo = await ask(`Is your number ${newNum}? `)
+      // check if yesNo is an invalid input
       while (yesNo.toLowerCase() !== 'n' && yesNo.toLowerCase() !== 'no' && yesNo.toLowerCase() !== 'y' && yesNo.toLowerCase() !== 'yes') {
         yesNo = await ask(`"${yesNo}" is an invalid input. Is your number ${newNum}? `)
       }
-      console.log('yesno in if higherlower = l', yesNo)
+      // add one to guess count after new guess
       guessNum += 1
       return newNum
     }
   }
+  // calls start function
   start()
 }
 // the reverse game
 function userGuess() {
-  async function start() {
+  async function startReverse() {
+    // assigns min range
     let min = 1
+    // assigns max range
     let max = 100
+    // assigns number of guesses
     let guessNum = 0
+    // generates random number for user to guess
     let randNum = Math.floor(Math.random() * (max - min + 1) + min)
     console.log("Let's play a game where I (computer) make up a number and you (human) try to guess it.")
+    // asks user for first guess and assigns it to userGuess
     let userGuess = await ask("Guess a number between 1 and 100 ")
     userGuess = parseInt(userGuess)
+    // checks if userGuess is NaN or outside range
     while (isNaN(userGuess) || userGuess > max || userGuess < min) {
       if (isNaN(userGuess)) {
         userGuess = await ask('You did not enter a number. Try again. ')
@@ -156,27 +169,57 @@ function userGuess() {
         userGuess = parseInt(userGuess)
       }
     }
+    // adds 1 to guess count
     guessNum += 1
+    // while loop containing if the guess is correct or incorrect
+    // if incorrect, loop until guess is correct
     while (userGuess !== randNum) {
+      // if the guess < the num, tell user the guess was too low and await new guess
       if (userGuess < randNum) {
         userGuess = await ask("Your guess was too low. Guess again. ")
         userGuess = parseInt(userGuess)
+        // add 1 to guess count
         guessNum += 1
+        // checks if guess is NaN or outside range
+        while (isNaN(userGuess) || userGuess > max || userGuess < min) {
+          if (isNaN(userGuess)) {
+            userGuess = await ask('You did not enter a number. Try again. ')
+            userGuess = parseInt(userGuess)
+          } else if (userGuess > max || userGuess < min) {
+            userGuess = await ask(`${userGuess} is outside the range. Pick another number `)
+            userGuess = parseInt(userGuess)
+          }
+        }
+        // if the guess > the num, tell user the guess was too high and await guess
       } else if (userGuess > randNum) {
         userGuess = await ask("Your guess was too high. Guess again. ")
         userGuess = parseInt(userGuess)
+        // add 1 to guess count
         guessNum += 1
+        // checks if guess is NaN or outside range
+        while (isNaN(userGuess) || userGuess > max || userGuess < min) {
+          if (isNaN(userGuess)) {
+            userGuess = await ask('You did not enter a number. Try again. ')
+            userGuess = parseInt(userGuess)
+          } else if (userGuess > max || userGuess < min) {
+            userGuess = await ask(`${userGuess} is outside the range. Pick another number `)
+            userGuess = parseInt(userGuess)
+          }
+        }
       }
+      // if guess is correct, ask to play again
     } if (userGuess === randNum) {
       console.log(`Congratulations! ${userGuess} was the correct number! It took you ${guessNum} guesses`)
       let again = await ask("Would you like to play again? ")
+      // if yes, call gameSelect function
       if (again.toLowerCase() === 'yes' || again.toLowerCase() === 'y') {
         gameSelect()
+        // exit program
       } else {
         console.log('Goodbye.')
         process.exit()
       }
     }
   }
-  start()
+  startReverse()
 }
